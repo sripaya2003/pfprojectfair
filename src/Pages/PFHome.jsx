@@ -1,4 +1,4 @@
-import React,{useState} from 'react'
+import React,{useState,useEffect} from 'react'
 import { Row,Col } from 'react-bootstrap'
 import desigenerImg from '../Assets/dev5.jpeg'
 import Homeprojects from '../Components/Homeprojects'
@@ -6,6 +6,14 @@ import { Link } from 'react-router-dom'
 
 function PFHome() {
   const [isLogged,setIsLogged]=useState(false)
+  useEffect(()=>{
+    if(localStorage.getItem("currentuser")){
+      setIsLogged(true)
+    }
+    else{
+      setIsLogged(false)
+    }
+  },[])
   return (
     <>
     <div className='container-fluid rounded' style={{width:'100%', height:'100vh', backgroundColor:'#99ffbb'}}>

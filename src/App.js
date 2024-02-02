@@ -13,8 +13,8 @@ function App() {
     <div className="App">
        <Routes>
          <Route path='/' element={<PFHome/>}/>
-         <Route path='/login' element={<Auth/>}/>
-         <Route path='/register' element={<Auth register/>}/>
+         <Route path='/Login' element={<Auth/>}/>
+         <Route path='/Register' element={<Auth register/>}/>
          <Route path='/projects' element={<Projects/>}/>
          <Route path='/Dashboard' element={<Dashboard/>}/>
        </Routes>

@@ -1,9 +1,64 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+import React ,{useState} from 'react'
+import { Link} from 'react-router-dom'
 import { Form } from 'react-bootstrap'
+import { registerApi,loginApi } from '../services/allApi'
+import { useNavigate,Navigate } from 'react-router-dom'
+import { ToastContainer,toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css';
+
 
 function Auth({register}) {
-    const registerForm = register ? true:false
+    const registerForm=register?true:false
+    const [ userData,setUserData]=useState({
+        username:"",password:"",email:""
+    })
+    const Navigate=useNavigate()
+    // console.log(userData)
+    const handleRegistration=async (e)=>{
+        e.preventDefault()
+        if(!userData.username || !userData.password || !userData.email){
+            toast.error("Enter values to every feilds")
+        }
+        else{
+            const res= await registerApi(userData) 
+            // console.log(res)
+            if(res.status===200){
+                toast.success(`registration of ${res.data.username} is successfull`)
+                setUserData({username:"",password:"",email:""})
+                Navigate('/Login')
+            }
+            
+            else{
+                console.log(res);
+                toast.error(res.response)
+            }
+        }
+        console.log(userData)
+    }
+    
+    const handleLogin=async (e) =>{
+        e.preventDefault()
+        console.log(userData);
+        const {email,password}=userData
+        if(!email || !password){
+            toast.info("Enter email and password")
+        }
+        else{
+            const res=await loginApi(userData)
+            console.log(res)
+            if(res.status===200){
+                localStorage.setItem("Currentuser",JSON.stringify(res.data.existingUser))
+                localStorage.setItem("role",res.data.role)
+                localStorage.setItem("token",res.data.token)
+                toast.success("Login Successfull!!")
+                setUserData({username:"",password:"",email:""})
+                Navigate('/')
+            }
+            else{
+                toast.error("Login faild!!")
+            }
+        }
+    }
   return (
     <div style={{width:'100%',height:'100vh'}} className='d-flex justify-content-center align-items-center'>
         <div className='container w-75'>
@@ -34,31 +89,29 @@ function Auth({register}) {
                                 registerForm &&
                                 <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
                                   <Form.Label>Username:</Form.Label>
-                                  <Form.Control type="text" placeholder="Enter Your Name" />
+                                  <Form.Control type="text" placeholder="Enter Your Name"  value={userData.username} onChange={(e)=>{setUserData({...userData,username:e.target.value})}} />
                                </Form.Group>
                             }
-                            <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
-                                  <Form.Label>E-Mail::</Form.Label>
-                                  <Form.Control type="text" placeholder="Enter Your Email" />
+                            <Form.Group className="mb-3" controlId="exampleForm.ControlInput2">
+                                  <Form.Label>E-Mail:</Form.Label>
+                                  <Form.Control type="text" placeholder="Enter Your Email"  value={userData.email} onChange={(e)=>{setUserData({...userData,email:e.target.value})}} />
                                </Form.Group>
-                               <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+                               <Form.Group className="mb-3" controlId="exampleForm.ControlInput3">
                                   <Form.Label>Password:</Form.Label>
-                                  <Form.Control type="password" placeholder="Enter Your Password" />
+                                  <Form.Control type="password" placeholder="Enter Your Password" value={userData.password} onChange={(e)=>{setUserData({...userData,password:e.target.value})}}  />
                                </Form.Group>
+                               </form>
                             {
                                 registerForm?
                                 <div>
-                                    <button  type='Submit' className='btn btn-primary'>Sign Up</button>
-                                    <Link to={'/Login'} className='ms-3'> Alredy a User? Sign Up</Link>
+                                    <button  type='Submit' className='btn btn-primary' onClick ={handleRegistration} >Sign Up</button>
+                                    <Link to={'/Login'} className='ms-3'> Alredy a User? Sign in...</Link>
                                 </div>:
                                 <div>
-                                <button  type='Submit' className='btn btn-primary'>Sign In</button>
-                                <Link to={'/Register'} className='ms-3'> New User Sign...</Link>
+                                <button  type='Submit' className='btn btn-primary' onClick ={handleLogin}>Sign In</button>
+                                <Link to={'/Register'} className='ms-3'> New User Sign up...</Link>
                             </div>
                             }
-
-                        </form>
-
                         </div>
 
                     </div>
@@ -67,7 +120,7 @@ function Auth({register}) {
 
             </div>
         </div>
-        
+        <ToastContainer/>
     </div>
   )
 }
